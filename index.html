@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Analysis: Semiconductor Diode Laser Equivalent Circuit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (max-width: 640px) {
+            .chart-container { height: 300px; }
+        }
+        /* Custom slider styling for better UI */
+        input[type=range] {
+            accent-color: #4f46e5;
+        }
+    </style>
+    <!-- Chosen Palette: Indigo and Slate. Background: Slate-50, Text: Slate-800, Accents: Indigo-600. Chosen for a clean, academic, and scientific feel. -->
+    <!-- Application Structure Plan: 
+         1. Header & Navigation: Sticky nav for easy jumping between sections.
+         2. Executive Summary: High-level overview of the thesis.
+         3. Theoretical Framework: Explains the 'Why' and 'How' of equivalent circuits (simplifying complex physics into RLC).
+         4. Interactive Simulation (The Results): A dynamic Chart.js module allowing the user to manipulate photon lifetime and feedback to see real-time impedance changes, reflecting the thesis findings.
+         5. Critical Analysis & Critique: Addresses the prompt's request to find mistakes/misinterpretations by detailing the limitations of linear models in non-linear physics. 
+         This structure moves the user from basic understanding -> interactive exploration -> critical academic review. 
+    -->
+    <!-- Visualization & Content Choices: 
+         - Goal: Inform -> Method: Clean typography and distinct card sections -> Justification: Breaks down dense academic text into digestible blocks.
+         - Goal: Compare/Change -> Method: Interactive Line Chart (Chart.js) -> Interaction: Sliders for Photon Lifetime and Feedback -> Justification: Directly visualizes the core conclusion from the report snippet (impedance peaks shifting with photon lifetime). No SVG/Mermaid used.
+         - Goal: Organize -> Method: CSS Grid for the 'Equivalent Circuit Mapping' -> Justification: Shows the relationship between physics equations and circuit components clearly without needing complex diagrams. 
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-indigo-700 tracking-tight">LaserCircuit.edu</span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#overview" class="text-slate-600 hover:text-indigo-600 font-medium transition-colors">Overview</a>
+                    <a href="#theory" class="text-slate-600 hover:text-indigo-600 font-medium transition-colors">Theory</a>
+                    <a href="#simulation" class="text-slate-600 hover:text-indigo-600 font-medium transition-colors">Interactive Model</a>
+                    <a href="#critique" class="text-slate-600 hover:text-indigo-600 font-medium transition-colors">Critical Critique</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header / Hero Section -->
+    <header class="bg-indigo-900 text-white py-16">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-indigo-200 text-sm font-semibold uppercase tracking-wider mb-2">Master's Thesis Interactive Breakdown</p>
+            <h1 class="text-3xl md:text-5xl font-bold mb-6 leading-tight">Equivalent Circuit Analysis of a Semiconductor Diode Laser with Feedback</h1>
+            <p class="text-lg md:text-xl text-indigo-100 mb-8 max-w-3xl mx-auto">
+                Author: Vishwa Chandrasekaran (May 2023)
+            </p>
+            <a href="#overview" class="inline-block bg-white text-indigo-900 font-semibold px-6 py-3 rounded-lg shadow hover:bg-indigo-50 transition-colors">
+                Start Exploring
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+
+        <!-- Section: Overview -->
+        <section id="overview" class="scroll-mt-24">
+            <div class="bg-white rounded-2xl shadow-sm p-8 md:p-10 border border-slate-100">
+                <div class="flex items-center mb-6">
+                    <div class="bg-indigo-100 p-3 rounded-lg mr-4">
+                        <span class="text-2xl">📄</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-900">1. Executive Overview</h2>
+                </div>
+                <p class="text-lg text-slate-700 leading-relaxed mb-6">
+                    This interactive dashboard dissects a Master's thesis focusing on the intersection of quantum electronics and microwave engineering. The core objective of the research is to translate the complex, non-linear optical physics of a semiconductor laser diode into a standard electrical "Equivalent Circuit" (resistors, capacitors, inductors). 
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mt-8">
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-indigo-700 mb-2">The Problem</h3>
+                        <p class="text-sm text-slate-600">Lasers are governed by complex differential "rate equations". For telecommunications engineers building fiber-optic networks, these equations are difficult to integrate into standard circuit design software.</p>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-indigo-700 mb-2">The Solution</h3>
+                        <p class="text-sm text-slate-600">By applying "small-signal analysis," the laser's physical parameters (like photon lifetime and cavity volume) are mapped to RLC components. The laser becomes a simple circuit model.</p>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-indigo-700 mb-2">The Twist (Feedback)</h3>
+                        <p class="text-sm text-slate-600">Light reflecting back into the laser (Optical Feedback) dramatically alters its behavior. The thesis models this feedback to see how it changes the laser's electrical impedance.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Theory & Mapping -->
+        <section id="theory" class="scroll-mt-24">
+            <div class="bg-white rounded-2xl shadow-sm p-8 md:p-10 border border-slate-100">
+                <div class="flex items-center mb-6">
+                    <div class="bg-indigo-100 p-3 rounded-lg mr-4">
+                        <span class="text-2xl">⚙️</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-900">2. The Physical-to-Electrical Translation</h2>
+                </div>
+                <p class="text-slate-700 mb-6">
+                    How do we turn light and electrons into circuit components? The rate equations describe the changing population of carriers (electrons) and photons. Below is the interactive mapping of how physical laser properties become electrical components in the model.
+                </p>
+
+                <!-- Interactive Mapping Grid (HTML/Tailwind only, NO SVG) -->
+                <div class="grid md:grid-cols-2 gap-4">
+                    <!-- Cards -->
+                    <div class="border-2 border-slate-200 rounded-lg p-4 hover:border-indigo-500 transition-colors cursor-pointer" onclick="updateTheoryContext('capacitor')">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-lg">Carrier Storage</h4>
+                            <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded">Capacitance (C)</span>
+                        </div>
+                        <p class="text-sm text-slate-500 mt-2">The laser's active region stores electrons before they recombine to emit light.</p>
+                    </div>
+                    
+                    <div class="border-2 border-slate-200 rounded-lg p-4 hover:border-indigo-500 transition-colors cursor-pointer" onclick="updateTheoryContext('inductor')">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-lg">Photon Lifetime</h4>
+                            <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded">Inductance (L)</span>
+                        </div>
+                        <p class="text-sm text-slate-500 mt-2">The time light spends bouncing in the cavity acts like electrical inertia.</p>
+                    </div>
+
+                    <div class="border-2 border-slate-200 rounded-lg p-4 hover:border-indigo-500 transition-colors cursor-pointer" onclick="updateTheoryContext('resistor')">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-lg">Spontaneous Emission</h4>
+                            <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded">Resistance (R)</span>
+                        </div>
+                        <p class="text-sm text-slate-500 mt-2">Energy lost to random light emission and non-radiative recombination acts as a damping resistor.</p>
+                    </div>
+
+                    <div class="border-2 border-slate-200 rounded-lg p-4 hover:border-indigo-500 transition-colors cursor-pointer bg-slate-50" onclick="updateTheoryContext('feedback')">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-lg text-indigo-700">Optical Feedback</h4>
+                            <span class="bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded">Admittance (Y)</span>
+                        </div>
+                        <p class="text-sm text-slate-500 mt-2">External reflections act as a parallel circuit branch, altering the resonant frequency.</p>
+                    </div>
+                </div>
+
+                <!-- Dynamic Context Box -->
+                <div id="theory-context-box" class="mt-6 bg-indigo-50 p-6 rounded-xl border border-indigo-100 min-h-[120px]">
+                    <p class="text-indigo-900 font-medium">Click on any physics concept above to see its detailed electrical mapping derived from the thesis.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Interactive Simulation (Results) -->
+        <section id="simulation" class="scroll-mt-24">
+            <div class="bg-white rounded-2xl shadow-sm p-8 md:p-10 border border-slate-100 border-t-4 border-t-indigo-500">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-slate-900">3. Interactive Thesis Results</h2>
+                    <p class="text-slate-600 mt-2">
+                        The thesis concludes: <em>"A longer photon lifetime... might lead to a greater output impedance peak at higher frequencies."</em> Simulate this behavior below. Watch how the laser's electrical resonance (Impedance Peak) changes as you alter physical parameters.
+                    </p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Controls -->
+                    <div class="lg:col-span-1 space-y-8 bg-slate-50 p-6 rounded-xl border border-slate-200">
+                        <div>
+                            <label for="photonSlider" class="block text-sm font-bold text-slate-700 mb-2">
+                                Photon Lifetime (<span id="photonVal" class="text-indigo-600">2.0</span> ps)
+                            </label>
+                            <input type="range" id="photonSlider" min="1.0" max="5.0" step="0.1" value="2.0" class="w-full">
+                            <p class="text-xs text-slate-500 mt-2">Time photons survive in the cavity. Increases gain and changes resonance.</p>
+                        </div>
+                        
+                        <div>
+                            <label for="feedbackSlider" class="block text-sm font-bold text-slate-700 mb-2">
+                                Optical Feedback Strength (<span id="feedbackVal" class="text-indigo-600">Low</span>)
+                            </label>
+                            <input type="range" id="feedbackSlider" min="0" max="100" step="1" value="10" class="w-full">
+                            <p class="text-xs text-slate-500 mt-2">Amount of light reflecting back into the laser. Causes damping and frequency shifts.</p>
+                        </div>
+
+                        <div class="bg-indigo-100 p-4 rounded-lg">
+                            <h4 class="font-bold text-indigo-800 text-sm mb-1">Live Observation</h4>
+                            <p id="live-observation" class="text-sm text-indigo-900 leading-tight">
+                                Base resonance established. The peak represents the relaxation oscillation frequency of the laser.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Chart -->
+                    <div class="lg:col-span-2">
+                        <div class="chart-container">
+                            <canvas id="impedanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Critical Critique & Mistakes -->
+        <section id="critique" class="scroll-mt-24">
+            <div class="bg-white rounded-2xl shadow-sm p-8 md:p-10 border border-slate-100">
+                <div class="flex items-center mb-6">
+                    <div class="bg-red-100 p-3 rounded-lg mr-4">
+                        <span class="text-2xl">⚠️</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-900">4. Academic Critique & Potential Misinterpretations</h2>
+                </div>
+                <p class="text-slate-700 mb-6 leading-relaxed">
+                    While translating laser rate equations into an RLC equivalent circuit is a powerful engineering tool, a critical review of this methodology (commonly found in Master's theses of this nature) reveals several inherent limitations and potential misinterpretations that readers must be aware of.
+                </p>
+
+                <div class="space-y-6">
+                    <!-- Critique Point 1 -->
+                    <div class="border-l-4 border-red-400 pl-4">
+                        <h3 class="font-bold text-lg text-slate-900">1. The "Small-Signal" Trap (Linearization Limit)</h3>
+                        <p class="text-slate-600 mt-1">
+                            <strong>The Mistake:</strong> Assuming this circuit model holds true under all conditions. <br>
+                            <strong>The Reality:</strong> RLC circuits are inherently <em>linear</em>. The laser rate equations are highly <em>non-linear</em>. To create this circuit, the mathematics rely on "small-signal analysis" (assuming tiny perturbations around a steady state). If the laser is modulated with a large signal (like turning it completely on and off for digital data), or subjected to <strong>strong optical feedback</strong>, the laser enters a chaotic regime (Coherence Collapse). In this regime, the equivalent circuit model completely breaks down and yields false predictions.
+                        </p>
+                    </div>
+
+                    <!-- Critique Point 2 -->
+                    <div class="border-l-4 border-yellow-400 pl-4">
+                        <h3 class="font-bold text-lg text-slate-900">2. Neglecting Package Parasitics</h3>
+                        <p class="text-slate-600 mt-1">
+                            <strong>The Misinterpretation:</strong> Viewing the thesis results as exactly what you would measure on an oscilloscope.<br>
+                            <strong>The Reality:</strong> The thesis snippet focuses on intrinsic carrier dynamics (photon lifetime affecting inductance/capacitance). However, real-world laser diodes are mounted on chips with bond wires and metal pads. At high frequencies (GHz range), the inductance of a tiny gold wire and the capacitance of a metal pad often dwarf the intrinsic physics of the laser. Failing to add "Extrinsic Parasitics" to the equivalent circuit means the theoretical high-frequency impedance peak will not match empirical laboratory data.
+                        </p>
+                    </div>
+
+                    <!-- Critique Point 3 -->
+                    <div class="border-l-4 border-blue-400 pl-4">
+                        <h3 class="font-bold text-lg text-slate-900">3. Single-Mode Assumption</h3>
+                        <p class="text-slate-600 mt-1">
+                            <strong>The Limitation:</strong> Standard equivalent circuits generally assume the laser emits exactly one wavelength of light (Single-Mode). Optical feedback frequently induces mode-hopping, where the laser rapidly switches between different wavelengths. The standard RLC model cannot easily account for multi-mode competitive dynamics without adding exceedingly complex parallel circuit branches for every optical mode.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center mt-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="mb-2">Analysis generated based on "Equivalent circuit analysis of a Semiconductor Diode Laser with Feedback"</p>
+            <p class="text-sm">Bibliography Reference: Tucker, R., Pope, D. (1983). Microwave Circuit Models... | Ozyazici, M.S. (2004).</p>
+        </div>
+    </footer>
+
+    <!-- Application Logic (JavaScript) -->
+    <script>
+        // State variables
+        let state = {
+            photonLifetime: 2.0, // ps
+            feedbackLevel: 10    // 0 to 100
+        };
+
+        // Chart.js Setup
+        let impedanceChart;
+        const ctx = document.getElementById('impedanceChart').getContext('2d');
+
+        // Mathematical Simulation Function (Approximating the physics)
+        // Impedance of parallel RLC: Z = 1 / sqrt( (1/R)^2 + (wC - 1/wL)^2 )
+        // We modify L, C, and R based on sliders to mimic the thesis conclusion.
+        function generateChartData() {
+            const frequencies = [];
+            const impedances = [];
+            
+            // Base parameters mapped to sliders
+            // Thesis snippet: "longer photon lifetime ... narrower gain bandwidth ... greater output impedance peak"
+            // We increase peak height and shift frequency slightly as lifetime increases.
+            
+            const baseFreq = 5.0; // GHz base resonance
+            const freqShift = (state.photonLifetime - 2.0) * 0.5;
+            const resonanceFreq = baseFreq - freqShift; 
+            
+            // Peak height scales with photon lifetime (thesis finding)
+            const peakHeightMultiplier = 1 + (state.photonLifetime - 2.0) * 0.4;
+            
+            // Feedback damps the resonance (lowers peak, widens bandwidth)
+            const dampingBase = 0.5;
+            const dampingAdded = (state.feedbackLevel / 100) * 1.5;
+            const dampingTotal = dampingBase + dampingAdded;
+
+            for (let f = 0.1; f <= 15; f += 0.2) {
+                frequencies.push(f.toFixed(1));
+                
+                // Lorentzian-like resonance approximation for RLC impedance magnitude
+                // Z(f) = Peak / sqrt( 1 + ((f - fres) / damping)^2 )
+                let z = (100 * peakHeightMultiplier) / Math.sqrt(1 + Math.pow((f - resonanceFreq) / dampingTotal, 2));
+                
+                // Add a baseline impedance
+                z += 10; 
+                
+                impedances.push(z);
+            }
+
+            return { frequencies, impedances };
+        }
+
+        function initChart() {
+            const data = generateChartData();
+            
+            impedanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.frequencies,
+                    datasets: [{
+                        label: 'Impedance Magnitude |Z| (Ohms)',
+                        data: data.impedances,
+                        borderColor: '#4f46e5', // Indigo-600
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `|Z|: ${context.parsed.y.toFixed(2)} Ω`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Modulation Frequency (GHz)', font: { weight: 'bold' } },
+                            grid: { display: false }
+                        },
+                        y: {
+                            title: { display: true, text: 'Impedance (Ohms)', font: { weight: 'bold' } },
+                            suggestedMin: 0,
+                            suggestedMax: 250
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            const data = generateChartData();
+            impedanceChart.data.labels = data.frequencies;
+            impedanceChart.data.datasets[0].data = data.impedances;
+            impedanceChart.update();
+            updateObservationText();
+        }
+
+        function updateObservationText() {
+            const obsBox = document.getElementById('live-observation');
+            let text = "";
+
+            if (state.photonLifetime > 3.5) {
+                text = "Notice the sharp, high peak. As stated in the thesis, a longer photon lifetime causes greater carrier density and higher gain, leading to a much greater impedance peak. The gain bandwidth also narrows.";
+            } else if (state.photonLifetime < 1.5) {
+                text = "Shorter photon lifetime results in a lower, broader impedance peak. Energy is lost from the cavity too quickly to build a strong resonance.";
+            } else if (state.feedbackLevel > 70) {
+                text = "High optical feedback introduces severe damping. In reality, beyond this point, the linear circuit model risks breaking down as the laser enters a chaotic, non-linear regime.";
+            } else {
+                text = "Standard operation. The peak represents the relaxation oscillation frequency—the natural 'ringing' frequency between electrons and photons.";
+            }
+            obsBox.innerText = text;
+        }
+
+        // Event Listeners
+        document.getElementById('photonSlider').addEventListener('input', (e) => {
+            state.photonLifetime = parseFloat(e.target.value);
+            document.getElementById('photonVal').innerText = state.photonLifetime.toFixed(1);
+            updateChart();
+        });
+
+        document.getElementById('feedbackSlider').addEventListener('input', (e) => {
+            state.feedbackLevel = parseInt(e.target.value);
+            let feedbackStr = "Low";
+            if(state.feedbackLevel > 30) feedbackStr = "Medium";
+            if(state.feedbackLevel > 70) feedbackStr = "High";
+            document.getElementById('feedbackVal').innerText = feedbackStr;
+            updateChart();
+        });
+
+        // Theory Context Logic
+        const theoryContexts = {
+            'capacitor': "<strong>Capacitance (C) corresponds to Carrier Storage.</strong><br><br>In physics, injecting current pumps electrons into the active region. It takes a tiny fraction of a second (carrier lifetime) for them to combine with holes and emit a photon. In an equivalent circuit, this 'waiting' or 'storage' of charge is mathematically modeled exactly like an electrical capacitor storing voltage.",
+            'inductor': "<strong>Inductance (L) corresponds to Photon Lifetime.</strong><br><br>Once light (photons) is generated, it bounces back and forth between the laser facets. The longer the light stays in the cavity (photon lifetime), the more 'momentum' or inertia the optical field has. In our circuit, electrical inertia is represented by an Inductor.",
+            'resistor': "<strong>Resistance (R) corresponds to Losses (Spontaneous Emission).</strong><br><br>Not all electrons produce useful laser light. Some undergo non-radiative recombination (creating heat) or spontaneous emission (random light). These are irreversible energy losses from the laser system. In the circuit model, energy loss is represented by resistors dampening the circuit.",
+            'feedback': "<strong>Feedback corresponds to an Added Admittance Y(ω).</strong><br><br>When light reflects off an external fiber and re-enters the laser, it forces the internal electric field to interact with a delayed version of itself. In circuit terms, this is modeled by adding a complex, frequency-dependent parallel branch (Admittance) to the existing RLC circuit, which shifts the resonant frequency."
+        };
+
+        function updateTheoryContext(key) {
+            const box = document.getElementById('theory-context-box');
+            box.innerHTML = `<p class="text-slate-800">${theoryContexts[key]}</p>`;
+            // Add a subtle flash animation
+            box.classList.remove('bg-indigo-50');
+            box.classList.add('bg-indigo-100');
+            setTimeout(() => {
+                box.classList.remove('bg-indigo-100');
+                box.classList.add('bg-indigo-50');
+            }, 300);
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            initChart();
+        };
+    </script>
+</body>
+</html>
